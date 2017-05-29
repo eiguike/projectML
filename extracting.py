@@ -27,7 +27,7 @@ vector = []
 empty_attributes = {}
 empty_lines = []
 
-with open('./bank-additional/bank-additional-full.csv', newline='') as csvfile:
+with open('./result/bank_clean.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
     count = 0
     count2 = 1
@@ -67,10 +67,28 @@ with open('./bank-additional/bank-additional-full.csv', newline='') as csvfile:
         count2 = count2 + 1
 
 def create_new_csv(lines, columns):
-    print(columns)
     with open('./bank-additional/bank-additional-full.csv', newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=";", quotechar='"')
         line_count = 1
+        with open('./result/bank_cleaned.csv', 'w') as csvfile2:
+            wr = csv.writer(csvfile2, delimiter=';', quotechar='"')
+            for row in spamreader:
+                vector = []
+                column_count = 0
+
+                if(line_count in lines):
+                    line_count += 1
+                    continue
+                else:
+                    for column in row:
+                        if(column_count in columns):
+                            column_count += 1
+                            continue
+                        vector.append(column)
+                        column_count += 1
+
+                    wr.writerow(vector)
+                    line_count += 1
         with open('./result/bank_not_clean.csv', 'w') as csvfile2:
             wr = csv.writer(csvfile2, delimiter=';', quotechar='"')
             for row in spamreader:

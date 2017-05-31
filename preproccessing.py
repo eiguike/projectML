@@ -16,13 +16,17 @@ vector = [{},jobs, marital, education, yes_no, yes_no, contact, \
         month, days_week, {}, {}, {}, {}, poutcome, \
         {}, {}, {}, {},{}, yes_no]
 
+vector_not_in = [0,9,10,11,12,13,14,15,16,17,18]
+
+vector_empty = []
+
 def transform(values):
     return
 
 def main():
     with open('./result/bank_cleaned.csv', newline='') as csvfile:
         row_count = 0
-        csv_reader = csv.reader(csvfile, delimiter=';')
+        csv_reader = csv.reader(csvfile, delimiter=',')
 
         for row in csv_reader:
 
@@ -30,51 +34,23 @@ def main():
                 row_count += 1
                 continue
 
+            new_vector = []
             column_count = 0
             for column in row:
-                if column_count == 0:
-                    if int(column) < 100:
-                        print("bimba")
-                elif (column_count == 9): # duration
-                    column_count += 1
-                    continue
-                elif (column_count == 10): # campaign
-                    column_count += 1
-                    continue
-                elif (column_count == 11): # pdays
-                    column_count += 1
-                    continue
-                elif (column_count == 12): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 13): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 14): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 15): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 16): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 17): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 18): # previous
-                    column_count += 1
-                    continue
-                elif (column_count == 19): # previous
-                    column_count += 1
-                    continue
+                if column_count in vector_not_in:
+                    new_vector.append(column)
                 else:
-                    print(column)
-                    print(vector[column_count][column])
-                    print("--------------------")
+                    new_vector.append(vector[column_count][column])
 
                 column_count += 1
+            vector_empty.append(new_vector)
             row_count += 1
+
+    with open('./result/bank_cleaned_preprocessed.csv', 'w') as csvfile2:
+        wr = csv.writer(csvfile2, delimiter=',', quotechar='"')
+        row_count = 0
+        for row in vector_empty:
+            wr.writerow(row)
 
 
 main()

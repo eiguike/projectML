@@ -16,7 +16,7 @@ vector = [{},jobs, marital, education, yes_no, yes_no, contact, \
         month, days_week, {}, {}, {}, {}, poutcome, \
         {}, {}, {}, {},{}, yes_no]
 
-vector_not_in = [0,9,10,11,12,13,14,15,16,17,18]
+vector_not_in = [0,9,10,11,12,14,15,16,17,18]
 
 vector_empty = []
 

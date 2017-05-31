@@ -71,7 +71,7 @@ def create_new_csv(lines, columns):
         spamreader = csv.reader(csvfile, delimiter=";", quotechar='"')
         line_count = 1
         with open('./result/bank_cleaned.csv', 'w') as csvfile2:
-            wr = csv.writer(csvfile2, delimiter=';', quotechar='"')
+            wr = csv.writer(csvfile2, delimiter=',', quotechar='"')
             for row in spamreader:
                 vector = []
                 column_count = 0
@@ -90,7 +90,7 @@ def create_new_csv(lines, columns):
                     wr.writerow(vector)
                     line_count += 1
         with open('./result/bank_not_clean.csv', 'w') as csvfile2:
-            wr = csv.writer(csvfile2, delimiter=';', quotechar='"')
+            wr = csv.writer(csvfile2, delimiter=',', quotechar='"')
             for row in spamreader:
                 vector = []
                 column_count = 0

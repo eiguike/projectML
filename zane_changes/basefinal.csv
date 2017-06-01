@@ -1,4 +1,3 @@
-age,bool_admin,bool_blue, bool_entrep, bool_housemaid,bool_management,bool_retired,bool_self, bool_services,bool_student, bool_tech, bool_unempl, bool_single, bool_married, bool_divorced,education, housing, loan, contact, month, day_of_week, duration, campaign, pdays, previous, bool_nonexistant, bool_fail, bool_success, empvarrate, conspriceidx, consconfidx, euribor, nremployed, class
 56,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,4,0,261,1,50,0,1,0,0,1.1,93.994,-36.4,4.857,5191,0
 57,0,0,0,0,0,0,0,1,0,0,0,0,1,0,4,0,0,0,4,0,149,1,50,0,1,0,0,1.1,93.994,-36.4,4.857,5191,0
 37,0,0,0,0,0,0,0,1,0,0,0,0,1,0,4,1,0,0,4,0,226,1,50,0,1,0,0,1.1,93.994,-36.4,4.857,5191,0

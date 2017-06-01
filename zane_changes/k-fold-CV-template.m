@@ -19,4 +19,4 @@ for (i = 0 : k-1)
 	acc = acc + some_algorithm(train_data, test_data)
 end
 
-acc = acc / 10
+acc = acc / k

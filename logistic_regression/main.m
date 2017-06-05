@@ -85,4 +85,3 @@ end
 
 acc = acc / k;
 fprintf('Acuracia na base de treinamento: %f\n', acc * 100);
-pause

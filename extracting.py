@@ -67,7 +67,7 @@ with open('./result/bank_clean.csv', newline='') as csvfile:
         count2 = count2 + 1
 
 def create_new_csv(lines, columns):
-    with open('./bank-additional/bank-additional-full.csv', newline='') as csvfile:
+    with open('./result/bank_clean.csv', newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=";", quotechar='"')
         line_count = 1
         with open('./result/bank_cleaned.csv', 'w') as csvfile2:

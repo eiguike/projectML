@@ -1,7 +1,7 @@
 clc; clear; close all
 
 dados = csvread('basefinal.csv');
-k = 10;
+k = 5;
 acc = 0;
 f_measure = 0;
 mcc = 0;

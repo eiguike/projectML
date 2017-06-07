@@ -1,4 +1,4 @@
-function acc = redes_neurais(basetreino, baseteste)
+function [acc, f_m, mcc_] = redes_neurais(basetreino, baseteste)
 
 % clear ; close all; clc
 
@@ -24,7 +24,7 @@ Theta2_inicial = rand(1, hidden_layer_size + 1) * 2 * init - init;
 
 parametros_iniciais = [Theta1_inicial(:) ; Theta2_inicial(:)];
 
-options = optimset('MaxIter', 5);
+options = optimset('MaxIter', 20);
 lambda = 1;
 
 funcaoCusto = @(p) rnaCusto(p, ...
@@ -42,5 +42,12 @@ Theta2 = reshape(rna_params((1 + (hidden_layer_size * (input_layer_size + 1))):e
 
 pred = predicao(Theta1, Theta2, Xteste);
 
-acc = mean(double(pred == yteste)) * 100;
+cm = confusionmat(yteste, pred);
+
+acc = accuracy(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+f_m = f_measure(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2))
+
 fprintf('\nAcuracia no conjunto de treinamento: %f\n', acc );
+fprintf('\nF-medida no conjunto de treinamento: %f\n', f_m );
+fprintf('\nMCC no conjunto de treinamento: %f\n', mcc_ );

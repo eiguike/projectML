@@ -2,7 +2,7 @@
 % kNN
 
 % loading database %
-X = csvread("../result/little.csv");
+X = csvread("../result/bank_cleaned_preprocessed.csv");
 K = 1
 
 % getting the final results %

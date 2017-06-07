@@ -3,7 +3,7 @@
 
 % loading database %
 X = csvread("../result/bank_cleaned_preprocessed.csv");
-K = 5
+K = 3
 
 % getting the final results %
 Y = X(:,end);
@@ -34,7 +34,7 @@ function D = distancia(x, X)
   endfor
 end
 
-function acc = knn(test_data, train_data, K)
+function [tp, fp, fn, tn] = knn(test_data, train_data, K)
 
   % getting final results %
   test_data_Y = test_data(:,end);
@@ -48,7 +48,7 @@ function acc = knn(test_data, train_data, K)
 
   Y_out = zeros(m, 1);
 
-  ind_viz = ones(K,1);  % Inicializa indices (linhas) em train_data das K amostras mais 
+  ind_viz = ones(K,1);  % Inicializa indices (linhas) em train_data das K amostras mais
 
   for i=1:m
     D = distancia(test_data(i,:), train_data);
@@ -69,8 +69,22 @@ function acc = knn(test_data, train_data, K)
     endif
   endfor
 
+  tp = sum(((Y_out == 0)+1) == (test_data_Y == 1));
+  fp = sum(((Y_out == 0)+1) == (test_data_Y == 0));
+  tn = sum(((Y_out == 1)+1) == (test_data_Y == 0));
+  fn = sum(((Y_out == 1)+1) == (test_data_Y == 1));
+
+  Y_out
+  test_data_Y
+  fprintf('tp: %d\n', tp);
+  fprintf('fp: %d\n', fp);
+  fprintf('tn: %d\n', tn);
+  fprintf('fn: %d\n', fn);
+  fprintf('acc: %f\n', (tp+tn)/(tp+fp+tn+fn));
   acc = mean(double(Y_out == test_data_Y));
 end
+
+fprintf('kNN iniciado!\n');
 
 [X_norm, mu, sigma] = normalizar(X);
 
@@ -94,4 +108,4 @@ end
 
 acc = acc / k;
 fprintf('Acuracia na base de treinamento: %f\n', acc * 100);
-pause
+fprintf('kNN concluído!\n');

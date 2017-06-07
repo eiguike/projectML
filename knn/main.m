@@ -2,8 +2,8 @@
 % kNN
 
 % loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
-K = 3
+X = csvread("../result/little.csv");
+K = 1
 
 % getting the final results %
 Y = X(:,end);
@@ -13,6 +13,23 @@ Y = X(:,end);
 
 % loading tests %
 %X_test = csvread("../input/bank.csv");
+
+function acc = accuracy(tp, fp, fn, tn)
+  acc = (tp + tn) / (tp + fp + fn + tn);
+  fprintf('acc: %f\n', acc);
+end
+
+function f_m = f_measure(tp, fp, fn, tn)
+  prec = tp / (tp + fp);
+  rec = tp / (tp + fn);
+  f_m = 2 * ((prec * rec) / (prec + rec));
+  fprintf('f_m: %f\n', f_m);
+end
+
+function mcc = mcc(tp, fp, fn, tn)
+  mcc =  ((tp * tn) - (fp * fn)) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)); 
+  fprintf('mcc: %f\n', mcc);
+end
 
 function [X_norm, mu, sigma] = normalizar(X)
   [m,n] = size(X); % m = qtde de objetos e n = qtde de atributos por objeto
@@ -74,17 +91,14 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   tn = sum(((Y_out == 1)+1) == (test_data_Y == 0));
   fn = sum(((Y_out == 1)+1) == (test_data_Y == 1));
 
-  Y_out
-  test_data_Y
   fprintf('tp: %d\n', tp);
   fprintf('fp: %d\n', fp);
   fprintf('tn: %d\n', tn);
   fprintf('fn: %d\n', fn);
-  fprintf('acc: %f\n', (tp+tn)/(tp+fp+tn+fn));
-  acc = mean(double(Y_out == test_data_Y));
 end
 
 fprintf('kNN iniciado!\n');
+tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
 
 [X_norm, mu, sigma] = normalizar(X);
 
@@ -103,9 +117,16 @@ for (i = 0 : k-1)
 	train_data = [   (X((1 : (inicio - 1)), :))   ;   (X((fim + 1) : num_amostras, :))   ];
 	test_data = X(inicio:fim, :);
 
-	acc = acc + knn(test_data, train_data, 5);
+	[tp, fp, fn, tn] = knn(test_data, train_data, K);
+  mcc_local = mcc_local + mcc(tp, fp, fn, tn);
+  f_m = f_m + f_measure(tp, fp, fn, tn);
+  acc = acc + accuracy(tp, fp, fn, tn);
 end
 
 acc = acc / k;
-fprintf('Acuracia na base de treinamento: %f\n', acc * 100);
+mcc_local = mcc_local / k;
+f_m = f_m / k;
+fprintf('mcc_total: %f\n', mcc_local * 100);
+fprintf('acc_total: %f\n', acc * 100);
+fprintf('f_m_total: %f\n', f_m * 100);
 fprintf('kNN concluído!\n');

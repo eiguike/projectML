@@ -107,7 +107,7 @@ tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
 [X_norm, mu, sigma] = normalizar(X);
 X_norm(:,end) = Y;
 
-k = 20;
+k = 10;
 acc = 0
 
 num_amostras = size(X, 1);

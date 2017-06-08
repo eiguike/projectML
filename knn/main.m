@@ -1,3 +1,10 @@
+% Machine Learning Project
+% kNN
+
+% loading database %
+X = csvread("../result/bank_cleaned_preprocessed_balanced.csv");
+K = 3
+
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);
   fprintf('acc: %f\n', acc);
@@ -28,10 +35,13 @@ function [X_norm, mu, sigma] = normalizar(X)
 end
 
 function D = distancia(x, X)
+  c = 3;
   [m,n] = size(X);
   D = zeros(m,1);
   for i = 1:m
-    D(i) = sqrt(sum( (x .- X(i)) .^ 2));
+    D(i) = sqrt(sum( (x - X(i)) .^ 2)); % euclidean distance
+    %D(i) = sum( sign((x - X(i))) .* (x - X(i)) ); % manhattan
+    %D(i) = (sum( (sign((x - X(i))) .* (x - X(i))).^c ))^(1/c); % Minkowski
   endfor
 end
 
@@ -53,9 +63,12 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
 
   for i=1:m
     D = distancia(test_data(i,:), train_data);
+    %[D, indices] =sort(D);
+    %D = horzcat(D, indices);
+
     D = horzcat(D, train_data_Y);
     D = horzcat(D, (1:size(D,1))');
-    D = sortrows(D);
+    D = sortrows(D,[1]);
 
     indices = D(:,end);
     classes = D(:,end-1);
@@ -81,12 +94,6 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   fprintf('fn: %d\n', fn);
 end
 
-% Machine Learning Project
-% kNN
-
-% loading database %
-X = csvread("../result/little.csv");
-K = 3
 
 % getting the final results %
 Y = X(:,end);
@@ -100,7 +107,7 @@ tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
 [X_norm, mu, sigma] = normalizar(X);
 X_norm(:,end) = Y;
 
-k = 10;
+k = 20;
 acc = 0
 
 num_amostras = size(X, 1);

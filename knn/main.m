@@ -1,19 +1,3 @@
-% Machine Learning Project
-% kNN
-
-% loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
-K = 1
-
-% getting the final results %
-Y = X(:,end);
-
-% removing final results from database %
-%X = X(:,1:(end-1));
-
-% loading tests %
-%X_test = csvread("../input/bank.csv");
-
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);
   fprintf('acc: %f\n', acc);
@@ -97,10 +81,24 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   fprintf('fn: %d\n', fn);
 end
 
+% Machine Learning Project
+% kNN
+
+% loading database %
+X = csvread("../result/little.csv");
+K = 3
+
+% getting the final results %
+Y = X(:,end);
+
+% loading tests %
+%X_test = csvread("../input/bank.csv");
+
 fprintf('kNN iniciado!\n');
 tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
 
 [X_norm, mu, sigma] = normalizar(X);
+X_norm(:,end) = Y;
 
 k = 10;
 acc = 0
@@ -108,7 +106,7 @@ acc = 0
 num_amostras = size(X, 1);
 tam_particao = ceil(num_amostras / k);
 
-X = X(randperm(num_amostras), :);
+X = X_norm(randperm(num_amostras), :);
 
 for (i = 0 : k-1)
 	inicio = (i * tam_particao) + 1;

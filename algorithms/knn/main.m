@@ -2,7 +2,7 @@
 % kNN
 
 % loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
+X = csvread("../../data/balanced_data.csv");
 K = 3
 
 num_amostras = size(X, 1);

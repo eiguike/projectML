@@ -96,11 +96,6 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   fp = sum(((Y_out == 0)+1) == (test_data_Y == 0));
   tn = sum(((Y_out == 1)+1) == (test_data_Y == 0));
   fn = sum(((Y_out == 1)+1) == (test_data_Y == 1));
-
-  fprintf('tp: %d\n', tp);
-  fprintf('fp: %d\n', fp);
-  fprintf('tn: %d\n', tn);
-  fprintf('fn: %d\n', fn);
 end
 
 
@@ -112,6 +107,7 @@ Y = X(:,end);
 
 fprintf('kNN iniciado!\n');
 tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
+tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = f_m = acc = 0;
 
 [X_norm, mu, sigma] = normalizar(X);
 X_norm(:,end) = Y;
@@ -132,15 +128,33 @@ for (i = 0 : k-1)
 	test_data = X(inicio:fim, :);
 
 	[tp, fp, fn, tn] = knn(test_data, train_data, K);
-  mcc_local = mcc_local + mcc(tp, fp, fn, tn);
-  f_m = f_m + f_measure(tp, fp, fn, tn);
-  acc = acc + accuracy(tp, fp, fn, tn);
+
+  fprintf('tp: %d\n', tp);
+  fprintf('fp: %d\n', fp);
+  fprintf('tn: %d\n', tn);
+  fprintf('fn: %d\n', fn);
+
+  tp_acumulator = tp + tp_acumulator;
+  fp_acumulator = fp + fp_acumulator;
+  tn_acumulator = tn + tn_acumulator;
+  fn_acumulator = fn + fn_acumulator;
+
+  mcc(tp, fp, fn, tn);
+  f_measure(tp, fp, fn, tn);
+  accuracy(tp, fp, fn, tn);
+  fprintf('=====================\n');
 end
 
-acc = acc / k;
-mcc_local = mcc_local / k;
-f_m = f_m / k;
-fprintf('mcc_total: %f\n', mcc_local * 100);
+acc = accuracy(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+mcc_local = mcc(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+f_m = f_measure(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+fprintf('=====================\n');
+fprintf('tp_total: %d\n', tp_acumulator);
+fprintf('fp_total: %d\n', fp_acumulator);
+fprintf('tn_total: %d\n', tn_acumulator);
+fprintf('fn_total: %d\n', fn_acumulator);
+
+fprintf('mcc_total: %f\n', mcc_local);
 fprintf('acc_total: %f\n', acc * 100);
 fprintf('f_m_total: %f\n', f_m * 100);
 fprintf('kNN concluído!\n');

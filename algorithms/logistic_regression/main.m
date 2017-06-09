@@ -2,25 +2,7 @@
 % Logistic Regression
 
 % loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
-
-num_amostras = size(X, 1);
-num_colunas = size(X, 2);
-
-X = sortrows(X, num_colunas);
-qtdpos = sum(X(:,num_colunas));
-
-X = [X(1:2*qtdpos, :); X(num_amostras - qtdpos + 1: num_amostras, :)];
-num_amostras = size(X, 1);
-
-% getting the final results %
-%Y = X(:,end);
-
-% removing final results from database %
-%X = X(:,1:(end-1));
-
-% loading tests %
-%X_test = csvread("../input/bank.csv");
+X = csvread("../../data/balanced_data.csv");
 
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);

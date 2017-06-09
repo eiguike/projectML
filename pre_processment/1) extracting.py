@@ -26,7 +26,7 @@ vector = []
 empty_attributes = {}
 empty_lines = []
 
-with open('raw_data.csv') as csvfile:
+with open('../data/raw_data.csv') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
     count = 0
     count2 = 1
@@ -66,7 +66,7 @@ with open('raw_data.csv') as csvfile:
         count2 = count2 + 1
 
 def create_new_csv(lines, columns):
-    with open('raw_data.csv') as csvfile:
+    with open('../data/raw_data.csv') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=";", quotechar='"')
         line_count = 1
         with open('bank_cleaned.csv', 'w') as csvfile2:
@@ -88,35 +88,5 @@ def create_new_csv(lines, columns):
 
                     wr.writerow(vector)
                     line_count += 1
-        with open('bank_not_clean.csv', 'w') as csvfile2:
-            wr = csv.writer(csvfile2, delimiter=',', quotechar='"')
-            for row in spamreader:
-                vector = []
-                column_count = 0
-
-                if(line_count not in lines):
-                    line_count += 1
-                    continue
-                else:
-                    for column in row:
-                        if(column_count in columns):
-                            column_count += 1
-                            continue
-                        vector.append(column)
-                        column_count += 1
-
-                    wr.writerow(vector)
-                    line_count += 1
-
-for empty_rows in empty_attributes:
-    print(empty_rows+":"+str(empty_attributes[empty_rows]))
-print("IDADE------------------------------------")
-print("Minimo idade: ", min(database['age']))
-print("Maximo idade: ", max(database['age']))
-
-for name in database:
-    if(name != "age") and (name != "duration"):
-        count_group(database, name)
-print("-----------------------------------------")
 
 create_new_csv(empty_lines,[4])

@@ -1,4 +1,6 @@
 import csv
+import random
+import os
 
 rows = []
 
@@ -72,15 +74,37 @@ class Amostra():
 
 
 with open('bank_cleaned_preprocessed.csv') as csvfile:
+	amostras_classe0 = []
+	amostras_classe1 = []
 	csv_reader = csv.reader(csvfile, delimiter=',')
-	f = open('basefinal.csv', 'a')
-	f.write("age,bool_admin,bool_blue, bool_entrep, bool_housemaid,bool_management,bool_retired,")
-	f.write("bool_self, bool_services,bool_student, bool_tech, bool_unempl, bool_single, bool_married, bool_divorced,")
-	f.write("education, housing, loan, contact, month, day_of_week, duration, campaign, pdays, previous, ")
-	f.write("bool_nonexistant, bool_fail, bool_success, empvarrate, conspriceidx, consconfidx, euribor, nremployed, class\n")
-	for row in csv_reader:
-		x = Amostra(row).toRow()
-		f.write(x)
-	f.close()
+	full = open('../data/data.csv', 'a+')
+	balanced = open('../data/balanced_data.csv', 'a+')
 
-c = raw_input()
+	full.write("age,bool_admin,bool_blue, bool_entrep, bool_housemaid,bool_management,bool_retired,")
+	full.write("bool_self, bool_services,bool_student, bool_tech, bool_unempl, bool_single, bool_married, bool_divorced,")
+	full.write("education, housing, loan, contact, month, day_of_week, duration, campaign, pdays, previous, ")
+	full.write("bool_nonexistant, bool_fail, bool_success, empvarrate, conspriceidx, consconfidx, euribor, nremployed, class\n")
+	for row in csv_reader:
+		amostra = Amostra(row)
+		full.write(amostra.toRow())
+
+		if (amostra.classe == "0"):
+			amostras_classe0.append(amostra)
+		else:
+			amostras_classe1.append(amostra)
+
+	num_amostras1 = len(amostras_classe1)
+
+	random.shuffle(amostras_classe0)
+
+	for i in range (0, 2 * num_amostras1):
+		balanced.write(amostras_classe0[i].toRow())
+
+	for amostra_classe1 in amostras_classe1:
+		balanced.write(amostra_classe1.toRow())
+
+	balanced.close()
+	full.close()
+
+os.remove('bank_cleaned.csv')
+os.remove('bank_cleaned_preprocessed.csv')

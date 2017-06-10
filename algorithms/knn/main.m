@@ -1,18 +1,13 @@
+%##KNN##%
+%K = 3
 % Machine Learning Project
 % kNN
 
 % loading database %
 X = csvread("../../data/balanced_data.csv");
-K = 3
 
-num_amostras = size(X, 1);
-num_colunas = size(X, 2);
-
-X = sortrows(X, num_colunas);
-qtdpos = sum(X(:,num_colunas));
-
-X = [X(1:2*qtdpos, :); X(num_amostras - qtdpos + 1: num_amostras, :)];
-num_amostras = size(X, 1);
+% variância permitida (PCA) %
+variancia = 0.99;
 
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);
@@ -98,27 +93,44 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   fn = sum(((Y_out == 1)+1) == (test_data_Y == 1));
 end
 
-
-% getting the final results %
+% armazenando classes de saída %
 Y = X(:,end);
-
-% loading tests %
-%X_test = csvread("../input/bank.csv");
 
 fprintf('kNN iniciado!\n');
 tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
 tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = f_m = acc = 0;
 
+% normalizando base de dados %
 [X_norm, mu, sigma] = normalizar(X);
 X_norm(:,end) = Y;
 
+% k-cross-validation %
 k = 10;
-acc = 0
 
-num_amostras = size(X, 1);
+[num_amostras, num_atributos] = size(X);
 tam_particao = ceil(num_amostras / k);
 
 X = X_norm(randperm(num_amostras), :);
+
+% aplicando pca %
+[U,S] = pca(X);
+
+% escolhendo nova dimensionalidade %
+for (dim=1 : num_atributos)
+  diagonal = diag(S);
+  aux = sum(diagonal(1:dim,:))/sum(diagonal);
+  if aux >= variancia
+    fprintf('Dimensão: %d\n',dim);
+    break
+  end
+endfor
+
+% dados na nova dimensionalidade %
+Z = projetarDados(X_norm, U, dim);
+X = Z';
+
+% recebendo classes %
+X(:,end) = Y;
 
 for (i = 0 : k-1)
 	inicio = (i * tam_particao) + 1;

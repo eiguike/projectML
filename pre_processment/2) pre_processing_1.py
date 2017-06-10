@@ -1,5 +1,6 @@
 import csv
 import math
+import random
 
 age_group = {}
 jobs = {"admin.": 0,"blue-collar": 1,"entrepreneur": 2,"housemaid": 3,"management": 4,"retired": 5,"self-employed": 6,"services": 7,"student": 8,"technician": 9,"unemployed": 10}
@@ -19,8 +20,10 @@ vector_not_in = [0,9,10,11,12,14,15,16,17,18]
 
 vector_empty = []
 
-def transform(values):
-    return
+responses = {"yes":0, "no":0}
+
+def getKey(item):
+    return item[19]
 
 def main():
     with open('bank_cleaned.csv') as csvfile:
@@ -28,7 +31,6 @@ def main():
         csv_reader = csv.reader(csvfile, delimiter=',')
 
         for row in csv_reader:
-
             if row_count == 0:
                 row_count += 1
                 continue
@@ -40,6 +42,8 @@ def main():
                     new_vector.append(column)
                 else:
                     new_vector.append(vector[column_count][column])
+                    if (column_count == 19):
+                        responses[column] += 1
 
                 column_count += 1
             vector_empty.append(new_vector)
@@ -50,6 +54,22 @@ def main():
         row_count = 0
         for row in vector_empty:
             wr.writerow(row)
+'''
+    vector_empty_sorted = sorted(vector_empty,key=getKey)
+    vector_no = vector_empty_sorted[0:responses["no"]-1]
+    vector_yes = vector_empty_sorted[responses["no"]:-1]
+
+    vector_no = random.sample(vector_no, responses["yes"])
+
+    new_vector = random.sample(vector_no + vector_yes, (2*responses["yes"])-1)
+
+    with open('./result/bank_cleaned_preprocessed_balanced.csv', 'w') as csvfile2:
+        wr = csv.writer(csvfile2, delimiter=',', quotechar='"')
+        row_count = 0
+        for row in new_vector:
+            wr.writerow(row)
+'''
+
 
 
 main()

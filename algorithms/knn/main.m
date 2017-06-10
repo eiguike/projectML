@@ -2,17 +2,17 @@
 % kNN
 
 % loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
-K = 1
+X = csvread("../../data/balanced_data.csv");
+K = 3
 
-% getting the final results %
-Y = X(:,end);
+num_amostras = size(X, 1);
+num_colunas = size(X, 2);
 
-% removing final results from database %
-%X = X(:,1:(end-1));
+X = sortrows(X, num_colunas);
+qtdpos = sum(X(:,num_colunas));
 
-% loading tests %
-%X_test = csvread("../input/bank.csv");
+X = [X(1:2*qtdpos, :); X(num_amostras - qtdpos + 1: num_amostras, :)];
+num_amostras = size(X, 1);
 
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);
@@ -44,10 +44,13 @@ function [X_norm, mu, sigma] = normalizar(X)
 end
 
 function D = distancia(x, X)
+  c = 3;
   [m,n] = size(X);
   D = zeros(m,1);
   for i = 1:m
-    D(i) = sqrt(sum( (x .- X(i)) .^ 2));
+    D(i) = sqrt(sum( (x - X(i)) .^ 2)); % euclidean distance
+    %D(i) = sum( sign((x - X(i))) .* (x - X(i)) ); % manhattan
+    %D(i) = (sum( (sign((x - X(i))) .* (x - X(i))).^c ))^(1/c); % Minkowski
   endfor
 end
 
@@ -69,9 +72,12 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
 
   for i=1:m
     D = distancia(test_data(i,:), train_data);
+    %[D, indices] =sort(D);
+    %D = horzcat(D, indices);
+
     D = horzcat(D, train_data_Y);
     D = horzcat(D, (1:size(D,1))');
-    D = sortrows(D);
+    D = sortrows(D,[1]);
 
     indices = D(:,end);
     classes = D(:,end-1);
@@ -90,17 +96,21 @@ function [tp, fp, fn, tn] = knn(test_data, train_data, K)
   fp = sum(((Y_out == 0)+1) == (test_data_Y == 0));
   tn = sum(((Y_out == 1)+1) == (test_data_Y == 0));
   fn = sum(((Y_out == 1)+1) == (test_data_Y == 1));
-
-  fprintf('tp: %d\n', tp);
-  fprintf('fp: %d\n', fp);
-  fprintf('tn: %d\n', tn);
-  fprintf('fn: %d\n', fn);
 end
+
+
+% getting the final results %
+Y = X(:,end);
+
+% loading tests %
+%X_test = csvread("../input/bank.csv");
 
 fprintf('kNN iniciado!\n');
 tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
+tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = f_m = acc = 0;
 
 [X_norm, mu, sigma] = normalizar(X);
+X_norm(:,end) = Y;
 
 k = 10;
 acc = 0
@@ -108,7 +118,7 @@ acc = 0
 num_amostras = size(X, 1);
 tam_particao = ceil(num_amostras / k);
 
-X = X(randperm(num_amostras), :);
+X = X_norm(randperm(num_amostras), :);
 
 for (i = 0 : k-1)
 	inicio = (i * tam_particao) + 1;
@@ -118,15 +128,33 @@ for (i = 0 : k-1)
 	test_data = X(inicio:fim, :);
 
 	[tp, fp, fn, tn] = knn(test_data, train_data, K);
-  mcc_local = mcc_local + mcc(tp, fp, fn, tn);
-  f_m = f_m + f_measure(tp, fp, fn, tn);
-  acc = acc + accuracy(tp, fp, fn, tn);
+
+  fprintf('tp: %d\n', tp);
+  fprintf('fp: %d\n', fp);
+  fprintf('tn: %d\n', tn);
+  fprintf('fn: %d\n', fn);
+
+  tp_acumulator = tp + tp_acumulator;
+  fp_acumulator = fp + fp_acumulator;
+  tn_acumulator = tn + tn_acumulator;
+  fn_acumulator = fn + fn_acumulator;
+
+  mcc(tp, fp, fn, tn);
+  f_measure(tp, fp, fn, tn);
+  accuracy(tp, fp, fn, tn);
+  fprintf('=====================\n');
 end
 
-acc = acc / k;
-mcc_local = mcc_local / k;
-f_m = f_m / k;
-fprintf('mcc_total: %f\n', mcc_local * 100);
+acc = accuracy(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+mcc_local = mcc(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+f_m = f_measure(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+fprintf('=====================\n');
+fprintf('tp_total: %d\n', tp_acumulator);
+fprintf('fp_total: %d\n', fp_acumulator);
+fprintf('tn_total: %d\n', tn_acumulator);
+fprintf('fn_total: %d\n', fn_acumulator);
+
+fprintf('mcc_total: %f\n', mcc_local);
 fprintf('acc_total: %f\n', acc * 100);
 fprintf('f_m_total: %f\n', f_m * 100);
 fprintf('kNN concluído!\n');

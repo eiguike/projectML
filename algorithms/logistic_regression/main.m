@@ -2,16 +2,7 @@
 % Logistic Regression
 
 % loading database %
-X = csvread("../result/bank_cleaned_preprocessed.csv");
-
-% getting the final results %
-%Y = X(:,end);
-
-% removing final results from database %
-%X = X(:,1:(end-1));
-
-% loading tests %
-%X_test = csvread("../input/bank.csv");
+X = csvread("../../data/balanced_data.csv");
 
 function acc = accuracy(tp, fp, fn, tn)
   acc = (tp + tn) / (tp + fp + fn + tn);
@@ -71,6 +62,7 @@ end
 fprintf('Regressão Logística iniciado!\n');
 
 [X_norm, mu, sigma] = normalizar(X);
+X_norm(:,end) = X(:,end);
 
 k = 10;
 acc = 0
@@ -80,7 +72,7 @@ tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = 
 num_amostras = size(X, 1);
 tam_particao = ceil(num_amostras / k);
 
-X = X(randperm(num_amostras), :);
+X = X_norm(randperm(num_amostras), :);
 
 for (i = 0 : k-1)
 	inicio = (i * tam_particao) + 1;
@@ -113,7 +105,7 @@ for (i = 0 : k-1)
   fprintf('tn: %d\n', tn);
   fprintf('fn: %d\n', fn);
 
-  tp_acumulator = tp + tp_acumulator; 
+  tp_acumulator = tp + tp_acumulator;
   fp_acumulator = fp + fp_acumulator;
   tn_acumulator = tn + tn_acumulator;
   fn_acumulator = fn + fn_acumulator;
@@ -133,7 +125,7 @@ fprintf('fp_total: %d\n', fp_acumulator);
 fprintf('tn_total: %d\n', tn_acumulator);
 fprintf('fn_total: %d\n', fn_acumulator);
 
-fprintf('mcc_total: %f\n', mcc_local * 100);
+fprintf('mcc_total: %f\n', mcc_local);
 fprintf('acc_total: %f\n', acc * 100);
 fprintf('f_m_total: %f\n', f_m * 100);
 fprintf('Regressão Logística concluído!\n');

@@ -54,7 +54,7 @@ def main():
         row_count = 0
         for row in vector_empty:
             wr.writerow(row)
-
+'''
     vector_empty_sorted = sorted(vector_empty,key=getKey)
     vector_no = vector_empty_sorted[0:responses["no"]-1]
     vector_yes = vector_empty_sorted[responses["no"]:-1]
@@ -68,6 +68,7 @@ def main():
         row_count = 0
         for row in new_vector:
             wr.writerow(row)
+'''
 
 
 

@@ -1,7 +1,7 @@
 %##KNN##%
 
 % carregando base de dados %
-X = csvread("../../data/balanced_data.csv");
+X = csvread("./../../data/balanced_data.csv");
 
 % variância permitida (PCA) %
 variancia = 0.98;
@@ -9,7 +9,7 @@ variancia = 0.98;
 % armazenando classes de saída %
 Y = X(:,end);
 
-fprintf('kNN iniciado!\n');
+fprintf('SVM iniciado!\n');
 
 % inicializando variáveis %
 tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
@@ -23,8 +23,10 @@ k = 10;
 
 [num_amostras, num_atributos] = size(X);
 tam_particao = ceil(num_amostras / k);
-
+X_norm(:,end) = Y;
 X = X_norm(randperm(num_amostras), :);
+
+Y = X(:,end);
 
 % aplicando pca %
 [U,S] = pca(X);
@@ -40,7 +42,7 @@ for (dim=1 : num_atributos)
 endfor
 
 % dados na nova dimensionalidade %
-Z = projetarDados(X_norm, U, dim);
+Z = projetarDados(X, U, dim);
 X = Z';
 X = horzcat(X,Y);
 

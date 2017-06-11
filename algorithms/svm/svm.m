@@ -6,7 +6,7 @@ function [tp, fp, fn, tn] = svm(train_data, test_data)
   X_test = test_data(:,1:(end - 1));
   y_test = test_data(:,end);
 
-  model = svmtrain(y_train, X_train, '-s 0 -t 0 -c 5 -m 1024');
+  model = svmtrain(y_train, X_train, '-s 0 -t 2 -c 1 -g 0.0078 -m 2048');
 
   [predicted_labels] = svmpredict(y_test, X_test, model);
 

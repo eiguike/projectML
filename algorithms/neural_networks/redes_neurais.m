@@ -39,10 +39,10 @@ cm = confusionmat(yteste, pred);
 
 acc = accuracy(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
 f_m = f_measure(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2))
+mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
 
-fprintf('\nTP = %f, FP = %f', cm(1, 1), cm(1, 2));
-fprintf('\nFN = %f, TN = %f', cm(2, 1), cm(2, 2));
-fprintf('\nAcuracia no conjunto de treinamento: %f\n', acc );
-fprintf('\nF-medida no conjunto de treinamento: %f\n', f_m );
-fprintf('\nMCC no conjunto de treinamento: %f\n', mcc_ );
+fprintf('TP = %f, FP = %f\n', cm(1, 1), cm(1, 2));
+fprintf('FN = %f, TN = %f\n\n', cm(2, 1), cm(2, 2));
+fprintf('Acuracia no conjunto de treinamento: %f\n', acc );
+fprintf('F-medida no conjunto de treinamento: %f\n', f_m );
+fprintf('MCC no conjunto de treinamento: %f\n\n', mcc_ );

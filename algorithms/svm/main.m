@@ -1,5 +1,10 @@
 clear ; close all; clc
 
+% Build libsvm library
+cd './libsvm-3.22/matlab'
+make octave
+cd '../..'
+
 % Add common functions to Octave search path
 addpath('../common');
 

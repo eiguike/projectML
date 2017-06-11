@@ -97,7 +97,7 @@ with open('bank_cleaned_preprocessed.csv') as csvfile:
 
 	random.shuffle(amostras_classe0)
 
-	for i in range (0, 2 * num_amostras1):
+	for i in range (0, num_amostras1):
 		balanced.write(amostras_classe0[i].toRow())
 
 	for amostra_classe1 in amostras_classe1:

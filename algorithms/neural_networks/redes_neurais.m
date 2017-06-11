@@ -1,16 +1,9 @@
 function [acc, f_m, mcc_] = redes_neurais(basetreino, baseteste)
 
-% clear ; close all; clc
-
-% dados = csvread('basefinal.csv');
-
 Xtreino = basetreino(:, 1: size(basetreino, 2) - 1);
-% X = normalizar(X);
 ytreino = basetreino(:, size(basetreino, 2));
 
-
 Xteste = baseteste(:, 1: size(baseteste, 2) - 1);
-% X = normalizar(X);
 yteste = baseteste(:, size(baseteste, 2));
 
 m = size(Xtreino, 1);

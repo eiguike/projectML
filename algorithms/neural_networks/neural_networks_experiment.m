@@ -84,7 +84,7 @@ for (i = 0 : k-1)
 
 
 	% Getting the results for this step of the experiment
-	[tp, fp, fn, tn] = redes_neurais(train_data, test_data);
+	[tp, fp, fn, tn] = redes_neurais(train_data, test_data, 5);
 	
 	% Accumulate measures
 	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];

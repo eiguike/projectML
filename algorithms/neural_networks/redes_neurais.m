@@ -35,19 +35,8 @@ Theta2 = reshape(rna_params((1 + (hidden_layer_size * (input_layer_size + 1))):e
 
 pred = predicao(Theta1, Theta2, Xteste);
 
-cm = confusionmat(yteste, pred);
+tp = sum(((pred == 0)+1) == (yteste == 1));
+fp = sum(((pred == 0)+1) == (yteste == 0));
+tn = sum(((pred == 1)+1) == (yteste == 0));
+fn = sum(((pred == 1)+1) == (yteste == 1));
 
-tp = cm(1, 1);
-fp = cm(1, 2);
-fn = cm(2, 1);
-tn = cm(2, 2);
-
-% acc = accuracy(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-% f_m = f_measure(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-% mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-
-% fprintf('TP = %f, FP = %f\n', cm(1, 1), cm(1, 2));
-% fprintf('FN = %f, TN = %f\n\n', cm(2, 1), cm(2, 2));
-% fprintf('Acuracia no conjunto de treinamento: %f\n', acc );
-% fprintf('F-medida no conjunto de treinamento: %f\n', f_m );
-% fprintf('MCC no conjunto de treinamento: %f\n\n', mcc_ );

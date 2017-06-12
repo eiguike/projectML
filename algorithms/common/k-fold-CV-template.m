@@ -84,7 +84,7 @@ for (i = 0 : k-1)
 
 
 	% Getting the results for this step of the experiment
-	[tp, fp, fn, tn] = SEU_ALGORITMO_AQUI(train_data, test_data, 5);
+	[tp, fp, fn, tn] = SEU_ALGORITMO_AQUI(train_data, test_data);
 	
 	% Accumulate measures
 	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];

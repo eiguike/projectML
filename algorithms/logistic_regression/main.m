@@ -1,131 +1,101 @@
-% Machine Learning Project
-% Logistic Regression
+% Clearing everything
+clc; clear; close all
 
-% loading database %
-X = csvread("../../data/balanced_data.csv");
+% Adding path for common functions
+addpath('../common')
 
-function acc = accuracy(tp, fp, fn, tn)
-  acc = (tp + tn) / (tp + fp + fn + tn);
-  fprintf('acc: %f\n', acc);
-end
+% Reading data
+data = csvread('../../data/balanced_data.csv');
 
-function f_m = f_measure(tp, fp, fn, tn)
-  prec = tp / (tp + fp);
-  rec = tp / (tp + fn);
-  f_m = 2 * ((prec * rec) / (prec + rec));
-  fprintf('f_m: %f\n', f_m);
-end
+% Storing number of samples and attributes
+sample_count = size(data, 1);
+num_attributes = size(data, 2);
 
-function mcc = mcc(tp, fp, fn, tn)
-  mcc =  ((tp * tn) - (fp * fn)) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)); 
-  fprintf('mcc: %f\n', mcc);
-end
+% Choosing k for k-fold cross validation
+k = 3;
 
-function [X_norm, mu, sigma] = normalizar(X)
-  [m,n] = size(X); % m = qtde de objetos e n = qtde de atributos por objeto
-  X_norm = zeros(m,n); % inicializa X_norm
-  mu = 0; % inicializa media
-  sigma = 1; % inicializa desvio padrao
-  X_norm = X;
-  mu = mean(X);
-  sigma = std(X);
-  X_norm = X_norm - mu;
-  X_norm = X_norm ./sigma;
-end
+% Initializing accuracy, f_measure and MCC accumulators
+measures = [0 0 0];
 
-function [J, grad] = funcaoCusto(theta, X, y)
-m = length(y); % numero de exemplos de treinamento
-J = 0;
-grad = zeros(size(theta));
-hyp = sigmoid(X*theta);
-J = (-y' * log(hyp) - (1 - y)' * log(1-hyp))/m;
-grad = (X' *(hyp - y))./m;
-end
+% Initializing PCA K value
+PCA_K = 1;
 
-function p = predicao(theta, X)
-m = size(X, 1); % Numero de examplos de treinamento
-p = zeros(m, 1);
-p = (sigmoid(theta' * X') >= 0.5)';
-end
+% Selecting desired variance keep for PCA
+desired_variance = 0.98;
 
-function g = sigmoid(z)
-g = zeros(size(z));
-g = 1 ./ (1 + e .^ -z);
-end
+% % Normalizing data
+% data = [normalizar(data(:, 1:num_attributes - 1)) data(:, num_attributes)];
 
-function p = predicao(theta, X)
-m = size(X, 1); % Numero de examplos de treinamento
-p = zeros(m, 1);
-p = (sigmoid(theta' * X') >= 0.5)';
-end
+% Getting the fold size for cross validation
+fold_size = ceil(sample_count / k);
 
-fprintf('Regressão Logística iniciado!\n');
+% Shuffling data
+data = data(randperm(sample_count), :);
 
-[X_norm, mu, sigma] = normalizar(X);
-X_norm(:,end) = X(:,end);
-
-k = 10;
-acc = 0
-tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
-tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = f_m = acc = 0;
-
-num_amostras = size(X, 1);
-tam_particao = ceil(num_amostras / k);
-
-X = X_norm(randperm(num_amostras), :);
-
+% For each cross validation iteration
 for (i = 0 : k-1)
-	inicio = (i * tam_particao) + 1;
-	fim = min(inicio + tam_particao - 1, num_amostras);
 
-	train_data = [   (X((1 : (inicio - 1)), :))   ;   (X((fim + 1) : num_amostras, :))   ];
-	test_data = X(inicio:fim, :);
+	% Getting the indexes for the start and end of the test fold
+	start_idx = (i * fold_size) + 1;
+	end_idx = min(start_idx + fold_size - 1, sample_count);
 
-  [m,n] = size(train_data);
-  %X = [ones(m,1), X];
-  theta_inicial = zeros(n,1);
-  %theta_inicial = zeros(n+1,1);
+	% Getting the train and test sets from the original set
+	train_data = [   (data((1 : (start_idx - 1)), :))   ;   (data((end_idx + 1) : sample_count, :))   ]; 
+	test_data = data(start_idx:end_idx, :);
 
-  test_data_Y = test_data(:,end);
+	% ------------------- NORMALIZATION BLOCK --------------------------
+	[X_norm, avg, stddev] = normalizar(train_data(:, 1:num_attributes-1));
+	X_norm_test = (test_data(:, 1:num_attributes-1) - repmat(avg, size(test_data, 1), 1)) ./ repmat(stddev, size(test_data, 1), 1);
 
-  [custo, grad] = funcaoCusto(theta_inicial, train_data, train_data(:,end));
-  opcoes = optimset('GradObj', 'on', 'MaxIter', 10000);
-  [theta, custo] = fminunc(@(t)(funcaoCusto(t, train_data, train_data(:,end))), theta_inicial, opcoes);
+	normalized_train_data = [X_norm train_data(:, num_attributes)];
+	normalized_test_data = [X_norm_test test_data(:, num_attributes)];
 
-  p = predicao(theta, test_data);
+	train_data = normalized_train_data;
+	test_data = normalized_test_data;
 
-  tp = sum(((p == 0)+1) == (test_data_Y == 1));
-  fp = sum(((p == 0)+1) == (test_data_Y == 0));
-  tn = sum(((p == 1)+1) == (test_data_Y == 0));
-  fn = sum(((p == 1)+1) == (test_data_Y == 1));
+	% -------------------------------------------------------------------
+
+	% ---------------------- PCA BLOCK ---------------------------------
+	X_train = train_data(:, 1:num_attributes-1);
+	Y_train = train_data(:, num_attributes);
+
+	X_test = test_data(:, 1:num_attributes-1);
+	Y_test = test_data(:, num_attributes);
+
+	[U, S] = pca(X_train);
+	diagonal = diag(S);
+
+	for (count = 1:num_attributes-1)
+		K = num_attributes - count;
+		if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
+			PCA_K = K;
+		end
+	end
+
+	fprintf('Chosen K for PCA: %d\n', PCA_K)
+
+	Z_train = projetarDados(X_train, U, PCA_K);
+	Z_test = projetarDados(X_test, U, PCA_K);
+
+	train_data = [Z_train Y_train];
+	test_data = [Z_test Y_test];
+	% ------------------------------------------------------------------
 
 
-  fprintf('tp: %d\n', tp);
-  fprintf('fp: %d\n', fp);
-  fprintf('tn: %d\n', tn);
-  fprintf('fn: %d\n', fn);
 
-  tp_acumulator = tp + tp_acumulator;
-  fp_acumulator = fp + fp_acumulator;
-  tn_acumulator = tn + tn_acumulator;
-  fn_acumulator = fn + fn_acumulator;
-
-  mcc(tp, fp, fn, tn);
-  f_measure(tp, fp, fn, tn);
-  accuracy(tp, fp, fn, tn);
-  fprintf('=====================\n');
+	% Getting the results for this step of the experiment
+	[tp, fp, fn, tn] = logistic(train_data, test_data);
+	
+	% Accumulate measures
+	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];
 end
 
-acc = accuracy(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
-mcc_local = mcc(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
-f_m = f_measure(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
+% Getting the measures' average
+measures = measures / k * 100;
 
-fprintf('tp_total: %d\n', tp_acumulator);
-fprintf('fp_total: %d\n', fp_acumulator);
-fprintf('tn_total: %d\n', tn_acumulator);
-fprintf('fn_total: %d\n', fn_acumulator);
-
-fprintf('mcc_total: %f\n', mcc_local);
-fprintf('acc_total: %f\n', acc * 100);
-fprintf('f_m_total: %f\n', f_m * 100);
-fprintf('Regressão Logística concluído!\n');
+% Printing results
+fprintf('-------Results-------\n');
+fprintf('Accuracy: %f\n', measures(1));
+fprintf('F-Measure: %f\n', measures(2));
+fprintf('MCC: %f\n', measures(3));
+fprintf('---------------------\n');

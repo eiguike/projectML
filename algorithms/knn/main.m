@@ -1,86 +1,102 @@
-%##KNN##%
+% Clearing everything
+clc; clear; close all
 
-% carregando base de dados %
-X = csvread("./../../data/balanced_data.csv");
+% Adding path for common functions
+addpath('../common')
 
-% variância permitida (PCA) %
-variancia = 0.98;
+% Reading data
+data = csvread('../../data/balanced_data.csv');
 
-% armazenando classes de saída %
-Y = X(:,end);
+% Storing number of samples and attributes
+sample_count = size(data, 1);
+num_attributes = size(data, 2);
 
-fprintf('SVM iniciado!\n');
+% Choosing k for k-fold cross validation
+k = 3;
 
-% inicializando variáveis %
-tp =  fp =  fn =  tn =  mcc_local = f_m = acc = 0;
-tp_acumulator =  fp_acumulator =  fn_acumulator =  tn_acumulator =  mcc_local = f_m = acc = 0;
+% Initializing accuracy, f_measure and MCC accumulators
+measures = [0 0 0];
 
-% normalizando base de dados %
-[X_norm, mu, sigma] = normalizar(X);
+% Initializing PCA K value
+PCA_K = 1;
 
-% k-cross-validation %
-k = 10;
+% Selecting desired variance keep for PCA
+desired_variance = 0.98;
 
-[num_amostras, num_atributos] = size(X);
-tam_particao = ceil(num_amostras / k);
-X_norm(:,end) = Y;
-X = X_norm(randperm(num_amostras), :);
+% % Normalizing data
+% data = [normalizar(data(:, 1:num_attributes - 1)) data(:, num_attributes)];
 
-Y = X(:,end);
+% Getting the fold size for cross validation
+fold_size = ceil(sample_count / k);
 
-% aplicando pca %
-[U,S] = pca(X);
+% Shuffling data
+data = data(randperm(sample_count), :);
 
-% escolhendo nova dimensionalidade %
-for (dim=1 : num_atributos)
-  diagonal = diag(S);
-  aux = sum(diagonal(1:dim,:))/sum(diagonal);
-  if aux >= variancia
-    fprintf('Dimensão: %d\n',dim);
-    break
-  end
-endfor
-
-% dados na nova dimensionalidade %
-Z = projetarDados(X, U, dim);
-X = Z';
-X = horzcat(X,Y);
-
+% For each cross validation iteration
 for (i = 0 : k-1)
-	inicio = (i * tam_particao) + 1;
-	fim = min(inicio + tam_particao - 1, num_amostras);
 
-	train_data = [   (X((1 : (inicio - 1)), :))   ;   (X((fim + 1) : num_amostras, :))   ];
-	test_data = X(inicio:fim, :);
+	% Getting the indexes for the start and end of the test fold
+	start_idx = (i * fold_size) + 1;
+	end_idx = min(start_idx + fold_size - 1, sample_count);
 
-	[tp, fp, fn, tn] = knn(test_data, train_data, K);
+	% Getting the train and test sets from the original set
+	train_data = [   (data((1 : (start_idx - 1)), :))   ;   (data((end_idx + 1) : sample_count, :))   ]; 
+	test_data = data(start_idx:end_idx, :);
 
-  fprintf('tp: %d\n', tp);
-  fprintf('fp: %d\n', fp);
-  fprintf('tn: %d\n', tn);
-  fprintf('fn: %d\n', fn);
+	% ------------------- NORMALIZATION BLOCK --------------------------
+	[X_norm, avg, stddev] = normalizar(train_data(:, 1:num_attributes-1));
+	X_norm_test = (test_data(:, 1:num_attributes-1) - repmat(avg, size(test_data, 1), 1)) ./ repmat(stddev, size(test_data, 1), 1);
 
-  tp_acumulator = tp + tp_acumulator;
-  fp_acumulator = fp + fp_acumulator;
-  tn_acumulator = tn + tn_acumulator;
-  fn_acumulator = fn + fn_acumulator;
+	normalized_train_data = [X_norm train_data(:, num_attributes)];
+	normalized_test_data = [X_norm_test test_data(:, num_attributes)];
 
-  mcc(tp, fp, fn, tn);
-  f_measure(tp, fp, fn, tn);
-  accuracy(tp, fp, fn, tn);
-  fprintf('=====================\n');
+	train_data = normalized_train_data;
+	test_data = normalized_test_data;
+
+	% -------------------------------------------------------------------
+
+	% ---------------------- PCA BLOCK ---------------------------------
+	X_train = train_data(:, 1:num_attributes-1);
+	Y_train = train_data(:, num_attributes);
+
+	X_test = test_data(:, 1:num_attributes-1);
+	Y_test = test_data(:, num_attributes);
+
+	[U, S] = pca(X_train);
+	diagonal = diag(S);
+
+	for (count = 1:num_attributes-1)
+		K = num_attributes - count;
+		if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
+			PCA_K = K;
+		end
+	end
+
+	fprintf('Chosen K for PCA: %d\n', PCA_K)
+
+	Z_train = projetarDados(X_train, U, PCA_K);
+	Z_test = projetarDados(X_test, U, PCA_K);
+
+	train_data = [Z_train Y_train];
+	test_data = [Z_test Y_test];
+	% ------------------------------------------------------------------
+  % K value for knn %
+  K = 3; % setting a default value %
+  %##KNN##%
+
+	% Getting the results for this step of the experiment
+	[tp, fp, fn, tn] = knn(train_data, test_data, K);
+
+	% Accumulate measures
+	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];
 end
 
-acc = accuracy(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
-mcc_local = mcc(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
-f_m = f_measure(tp_acumulator, fp_acumulator, fn_acumulator, tn_acumulator);
-fprintf('=====================\n');
-fprintf('tp_total: %d\n', tp_acumulator);
-fprintf('fp_total: %d\n', fp_acumulator);
-fprintf('tn_total: %d\n', tn_acumulator);
-fprintf('fn_total: %d\n', fn_acumulator);
+% Getting the measures' average
+measures = measures / k * 100;
 
-fprintf('mcc_total: %f\n', mcc_local);
-fprintf('acc_total: %f\n', acc * 100);
-fprintf('f_m_total: %f\n', f_m * 100);
-fprintf('kNN concluído!\n');
+% Printing results
+fprintf('-------Results-------\n');
+fprintf('Accuracy: %f\n', measures(1));
+fprintf('F-Measure: %f\n', measures(2));
+fprintf('MCC: %f\n', measures(3));
+fprintf('---------------------\n');

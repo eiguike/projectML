@@ -1,4 +1,4 @@
-function [acc, f_m, mcc_] = redes_neurais(basetreino, baseteste)
+function [tp, fp, fn, tn] = redes_neurais(basetreino, baseteste, num_internal_nodes)
 
 Xtreino = basetreino(:, 1: size(basetreino, 2) - 1);
 ytreino = basetreino(:, size(basetreino, 2));
@@ -9,7 +9,7 @@ yteste = baseteste(:, size(baseteste, 2));
 m = size(Xtreino, 1);
 
 input_layer_size  = size(Xtreino,2);  
-hidden_layer_size = 5;   
+hidden_layer_size = num_internal_nodes;   
 
 init = 0.12;
 Theta1_inicial = rand(hidden_layer_size, input_layer_size + 1) * 2 * init - init;
@@ -37,12 +37,17 @@ pred = predicao(Theta1, Theta2, Xteste);
 
 cm = confusionmat(yteste, pred);
 
-acc = accuracy(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-f_m = f_measure(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
-mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+tp = cm(1, 1);
+fp = cm(1, 2);
+fn = cm(2, 1);
+tn = cm(2, 2);
 
-fprintf('TP = %f, FP = %f\n', cm(1, 1), cm(1, 2));
-fprintf('FN = %f, TN = %f\n\n', cm(2, 1), cm(2, 2));
-fprintf('Acuracia no conjunto de treinamento: %f\n', acc );
-fprintf('F-medida no conjunto de treinamento: %f\n', f_m );
-fprintf('MCC no conjunto de treinamento: %f\n\n', mcc_ );
+% acc = accuracy(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+% f_m = f_measure(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+% mcc_ = mcc(cm(1, 1), cm(1, 2), cm(2, 1), cm(2,2));
+
+% fprintf('TP = %f, FP = %f\n', cm(1, 1), cm(1, 2));
+% fprintf('FN = %f, TN = %f\n\n', cm(2, 1), cm(2, 2));
+% fprintf('Acuracia no conjunto de treinamento: %f\n', acc );
+% fprintf('F-medida no conjunto de treinamento: %f\n', f_m );
+% fprintf('MCC no conjunto de treinamento: %f\n\n', mcc_ );

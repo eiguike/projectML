@@ -1,4 +1,4 @@
-function [tp, fp, fn, tn] = svm(train_data, test_data)
+function [tp, fp, fn, tn] = svm(train_data, test_data, C, gamma)
 
   X_train = train_data(:,1:(end - 1));
   y_train = train_data(:,end);
@@ -6,9 +6,11 @@ function [tp, fp, fn, tn] = svm(train_data, test_data)
   X_test = test_data(:,1:(end - 1));
   y_test = test_data(:,end);
 
-  model = svmtrain(y_train, X_train, '-s 0 -t 2 -c 1 -g 0.0078 -m 2048');
+  svm_opts = cstrcat('-s 0 -t 2 -m 2048 -q -c ', num2str(C, '%.5f'), ' -g ', num2str(gamma, '%.12f'));
 
-  [predicted_labels] = svmpredict(y_test, X_test, model);
+  model = svmtrain(y_train, X_train, svm_opts);
+
+  [predicted_labels] = svmpredict(y_test, X_test, model, '-q');
 
   tp = sum(((predicted_labels == 0)+1) == (y_test == 1));
   fp = sum(((predicted_labels == 0)+1) == (y_test == 0));

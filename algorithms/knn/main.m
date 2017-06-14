@@ -12,7 +12,7 @@ sample_count = size(data, 1);
 num_attributes = size(data, 2);
 
 % Choosing k for k-fold cross validation
-k = 3;
+k = 5;
 
 % Initializing accuracy, f_measure and MCC accumulators
 measures = [0 0 0];
@@ -22,6 +22,7 @@ PCA_K = 1;
 
 % Selecting desired variance keep for PCA
 desired_variance = 0.98;
+%##VARIANCE##%
 
 % % Normalizing data
 % data = [normalizar(data(:, 1:num_attributes - 1)) data(:, num_attributes)];

@@ -21,7 +21,7 @@ measures = [0 0 0];
 PCA_K = 1;
 
 % Selecting desired variance keep for PCA
-desired_variance = 0.98;
+desired_variance = 0.95;
 %##VARIANCE##%
 
 % % Normalizing data
@@ -82,7 +82,7 @@ for (i = 0 : k-1)
 	test_data = [Z_test Y_test];
 	% ------------------------------------------------------------------
   % K value for knn %
-  K = 3; % setting a default value %
+  K = 7; % setting a default value %
   %##KNN##%
 
 	% Getting the results for this step of the experiment

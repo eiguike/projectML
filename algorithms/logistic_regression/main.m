@@ -12,7 +12,7 @@ sample_count = size(data, 1);
 num_attributes = size(data, 2);
 
 % Choosing k for k-fold cross validation
-k = 3;
+k = 5;
 
 % Initializing accuracy, f_measure and MCC accumulators
 measures = [0 0 0];
@@ -21,7 +21,7 @@ measures = [0 0 0];
 PCA_K = 1;
 
 % Selecting desired variance keep for PCA
-desired_variance = 0.98;
+desired_variance = 0.98; % setting a default value %
 
 % % Normalizing data
 % data = [normalizar(data(:, 1:num_attributes - 1)) data(:, num_attributes)];
@@ -56,35 +56,36 @@ for (i = 0 : k-1)
 	% -------------------------------------------------------------------
 
 	% ---------------------- PCA BLOCK ---------------------------------
-	X_train = train_data(:, 1:num_attributes-1);
-	Y_train = train_data(:, num_attributes);
+	%X_train = train_data(:, 1:num_attributes-1);
+	%Y_train = train_data(:, num_attributes);
 
-	X_test = test_data(:, 1:num_attributes-1);
-	Y_test = test_data(:, num_attributes);
+	%X_test = test_data(:, 1:num_attributes-1);
+	%Y_test = test_data(:, num_attributes);
 
-	[U, S] = pca(X_train);
-	diagonal = diag(S);
+	%[U, S] = pca(X_train);
+	%diagonal = diag(S);
 
-	for (count = 1:num_attributes-1)
-		K = num_attributes - count;
-		if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
-			PCA_K = K;
-		end
-	end
+	%for (count = 1:num_attributes-1)
+	%	K = num_attributes - count;
+	%	if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
+	%		PCA_K = K;
+	%	end
+	%end
 
-	fprintf('Chosen K for PCA: %d\n', PCA_K)
+	%fprintf('Chosen K for PCA: %d\n', PCA_K)
 
-	Z_train = projetarDados(X_train, U, PCA_K);
-	Z_test = projetarDados(X_test, U, PCA_K);
+	%Z_train = projetarDados(X_train, U, PCA_K);
+	%Z_test = projetarDados(X_test, U, PCA_K);
 
-	train_data = [Z_train Y_train];
-	test_data = [Z_test Y_test];
+	%train_data = [Z_train Y_train];
+	%test_data = [Z_test Y_test];
 	% ------------------------------------------------------------------
 
-
+  lambda = 1;
+  %##LOGISTIC##% % this value is defined when is using start.sh script %
 
 	% Getting the results for this step of the experiment
-	[tp, fp, fn, tn] = logistic(train_data, test_data);
+	[tp, fp, fn, tn] = logistic(train_data, test_data, lambda);
 	
 	% Accumulate measures
 	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];

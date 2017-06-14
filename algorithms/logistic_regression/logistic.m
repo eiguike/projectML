@@ -1,11 +1,11 @@
-function [tp, fp, fn, tn] = logistic(train_data, test_data)
+function [tp, fp, fn, tn] = logistic(train_data, test_data, lambda)
   [m,n] = size(train_data);
   theta_inicial = zeros(n,1);
 
   test_data_Y = test_data(:,end);
 
   opcoes = optimset('GradObj', 'on', 'MaxIter', 100000);
-  [theta, custo] = fminunc(@(t)(funcaoCusto(t, train_data, train_data(:,end))), theta_inicial, opcoes);
+  [theta, custo] = fminunc(@(t)(funcaoCustoReg(t, train_data, train_data(:,end), lambda)), theta_inicial, opcoes);
 
   p = predicao(theta, test_data);
 

@@ -1,25 +1,25 @@
 #!/bin/bash
 
-DATE=`date +%Y-%m-%d:%H:%M:%S`
-mkdir ./resultado_$DATE
+array[0]=0
+array[1]=0.01
+array[2]=0.05
+array[3]=0.1
+array[4]=0.25
+array[5]=0.5
+array[6]=0.75
+array[7]=1
 
-array[0]=0.99
-array[1]=0.98
-array[2]=0.97
-array[3]=0.96
-array[4]=0.95
-array[5]=0.94
-array[6]=0.93
-array[7]=0.92
-array[8]=0.91
-
-for i in {0..8}; do
-  cp main.m K$i.m
-  sed -i 's/%##LOGISTIC##%/'"desired_variance = ${array[$i]};"'/g' K$i.m
-  printf "source K$i.m\nexit\n" > entrada$i
-  octave-cli < entrada$i > ./resultado_$DATE/resultado_$i.txt &
+for i2 in {1..5}; do
+  DATE=`date +%Y-%m-%d:%H:%M:%S`
+  mkdir ./resultado_$DATE
+  for i in {0..7}; do
+    cp main.m lambda$i.m
+    sed -i 's/%##LOGISTIC##%/'"lambda = ${array[$i]}"'/g' lambda$i.m
+    printf "source lambda$i.m\nexit\n" > entrada$i
+    octave-cli < entrada$i > ./resultado_$DATE/resultado_lambda$i.txt &
+  done
+  sleep 13
+  rm entrada*
+  rm lambda*
+  mv resultado_$DATE $i2
 done
-
-sleep 2
-rm entrada*
-rm K*

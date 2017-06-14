@@ -32,71 +32,77 @@ fold_size = ceil(sample_count / k);
 % Shuffling data
 data = data(randperm(sample_count), :);
 
+lambdas = [0.01 0.05 0.1 0.25 0.5 0.75 1 2];
 % For each cross validation iteration
-for (i = 0 : k-1)
+for (i2 = 1 : size(lambdas'))
+  for (i = 0 : k-1)
 
-	% Getting the indexes for the start and end of the test fold
-	start_idx = (i * fold_size) + 1;
-	end_idx = min(start_idx + fold_size - 1, sample_count);
+    % Getting the indexes for the start and end of the test fold
+    start_idx = (i * fold_size) + 1;
+    end_idx = min(start_idx + fold_size - 1, sample_count);
 
-	% Getting the train and test sets from the original set
-	train_data = [   (data((1 : (start_idx - 1)), :))   ;   (data((end_idx + 1) : sample_count, :))   ]; 
-	test_data = data(start_idx:end_idx, :);
+    % Getting the train and test sets from the original set
+    train_data = [   (data((1 : (start_idx - 1)), :))   ;   (data((end_idx + 1) : sample_count, :))   ]; 
+    test_data = data(start_idx:end_idx, :);
 
-	% ------------------- NORMALIZATION BLOCK --------------------------
-	[X_norm, avg, stddev] = normalizar(train_data(:, 1:num_attributes-1));
-	X_norm_test = (test_data(:, 1:num_attributes-1) - repmat(avg, size(test_data, 1), 1)) ./ repmat(stddev, size(test_data, 1), 1);
+    % ------------------- NORMALIZATION BLOCK --------------------------
+    [X_norm, avg, stddev] = normalizar(train_data(:, 1:num_attributes-1));
+    X_norm_test = (test_data(:, 1:num_attributes-1) - repmat(avg, size(test_data, 1), 1)) ./ repmat(stddev, size(test_data, 1), 1);
 
-	normalized_train_data = [X_norm train_data(:, num_attributes)];
-	normalized_test_data = [X_norm_test test_data(:, num_attributes)];
+    normalized_train_data = [X_norm train_data(:, num_attributes)];
+    normalized_test_data = [X_norm_test test_data(:, num_attributes)];
 
-	train_data = normalized_train_data;
-	test_data = normalized_test_data;
+    train_data = normalized_train_data;
+    test_data = normalized_test_data;
 
-	% -------------------------------------------------------------------
+    % -------------------------------------------------------------------
 
-	% ---------------------- PCA BLOCK ---------------------------------
-	%X_train = train_data(:, 1:num_attributes-1);
-	%Y_train = train_data(:, num_attributes);
+    % ---------------------- PCA BLOCK ---------------------------------
+    %X_train = train_data(:, 1:num_attributes-1);
+    %Y_train = train_data(:, num_attributes);
 
-	%X_test = test_data(:, 1:num_attributes-1);
-	%Y_test = test_data(:, num_attributes);
+    %X_test = test_data(:, 1:num_attributes-1);
+    %Y_test = test_data(:, num_attributes);
 
-	%[U, S] = pca(X_train);
-	%diagonal = diag(S);
+    %[U, S] = pca(X_train);
+    %diagonal = diag(S);
 
-	%for (count = 1:num_attributes-1)
-	%	K = num_attributes - count;
-	%	if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
-	%		PCA_K = K;
-	%	end
-	%end
+    %for (count = 1:num_attributes-1)
+    %	K = num_attributes - count;
+    %	if ((sum(diagonal(1:K) / sum(diagonal))) > desired_variance)
+    %		PCA_K = K;
+    %	end
+    %end
 
-	%fprintf('Chosen K for PCA: %d\n', PCA_K)
+    %fprintf('Chosen K for PCA: %d\n', PCA_K)
 
-	%Z_train = projetarDados(X_train, U, PCA_K);
-	%Z_test = projetarDados(X_test, U, PCA_K);
+    %Z_train = projetarDados(X_train, U, PCA_K);
+    %Z_test = projetarDados(X_test, U, PCA_K);
 
-	%train_data = [Z_train Y_train];
-	%test_data = [Z_test Y_test];
-	% ------------------------------------------------------------------
+    %train_data = [Z_train Y_train];
+    %test_data = [Z_test Y_test];
+    % ------------------------------------------------------------------
 
-  lambda = 1;
-  %##LOGISTIC##% % this value is defined when is using start.sh script %
+    % Getting the results for this step of the experiment
+    [tp, fp, fn, tn] = logistic(train_data, test_data, lambdas(i2));
 
-	% Getting the results for this step of the experiment
-	[tp, fp, fn, tn] = logistic(train_data, test_data, lambda);
-	
-	% Accumulate measures
-	measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];
+    % Accumulate measures
+    measures = measures + [accuracy(tp, fp, fn, tn) , f_measure(tp, fp, fn, tn), mcc(tp, fp, fn, tn)];
+  end
+  % Getting the measures' average
+  measures = measures / k * 100;
+
+  % Printing results
+  fprintf('-------Results-------\n');
+  lambdas(i2)
+  fprintf('Accuracy: %f\n', measures(1));
+  fprintf('F-Measure: %f\n', measures(2));
+  fprintf('MCC: %f\n', measures(3));
+  fprintf('---------------------\n');
+
+  measures(1) = 0;
+  measures(2) = 0;
+  measures(3) = 0;
 end
 
-% Getting the measures' average
-measures = measures / k * 100;
 
-% Printing results
-fprintf('-------Results-------\n');
-fprintf('Accuracy: %f\n', measures(1));
-fprintf('F-Measure: %f\n', measures(2));
-fprintf('MCC: %f\n', measures(3));
-fprintf('---------------------\n');

@@ -21,5 +21,4 @@ for i2 in {1..5}; do
   sleep 13
   rm entrada*
   rm lambda*
-  mv resultado_$DATE $i2
 done

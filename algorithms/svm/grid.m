@@ -16,7 +16,7 @@ addpath('./libsvm-3.22/matlab');
 data = csvread('../../data/balanced_data.csv');
 
 % Grid Search ranges and steps for each parameter
-C_range = [2^13 2^15];
+C_range = [2^-5 2^15];
 gamma_range = [2^-13 2^1];
 C_step = gamma_step = 2^2;
 

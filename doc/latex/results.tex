@@ -1,0 +1,34 @@
+\section{Resultados}
+
+Nesta seção, serão apresentados os resultados da aplicação dos algoritmos anteriormente citados na predição de vendas em telemarketing bancário, juntamente com sua discussão.
+
+Foram realizados dez experimentos com cada algoritmo, e a Tabela \ref{tab:tabela_resultados} apresenta a média e o desvio padrão dos resultados obtidos, ordenadas por MCC. Os valores em negrito representam os melhores desempenhos para cada métrica avaliada.
+
+\begin{table}[ht]
+	\centering
+  \begin{tabular}{  c | c | c | c }
+    \hline 
+    Teste & Acc (\%) & F-Medida & MCC\\ \hline 
+    Reg. Logística & $\bf{97.54 \pm 0.12} $ & $\bf{0.976 \pm 0.012}$ & $\bf{0.952 \pm 0.023}$ \\ 
+    SVM & $87.55 \pm 0.14 $ & $0.880 \pm 0.014$ & $0.753 \pm 0.029$ \\ 
+    Redes Neurais & $87.47 \pm 0.10 $ & $0.879 \pm 0.012$ & $0.751 \pm 0.022$ \\ 
+    k-NN & $51.86 \pm 1.28 $ & $0.540 \pm 0.013$ & $0.038 \pm 0.026$ \\ 
+    \hline 
+  \end{tabular}
+  \caption{Resultados}
+  \label{tab:tabela_resultados}
+\end{table} 
+
+Analisando os resultados, vemos uma clara disparidade entre o k-vizinhos e os outros algoritmos. Os resultados do k-vizinhos indicam uma classificação levemente melhor do que a aleatoriedade, fazendo com que não seja uma boa opção para prever as vendas utilizando a base que obtemos.
+
+Em \cite{knn_explicacao} é verificado que, após as primeiras 20 dimensões de atributos, a distinção da distância entre as amostras diminui-se num nível extremamente rápido, fazendo com que bases excedendo esse número de atributos, como é o caso, tenham resultados ruins. Em contrapartida, a aplicação de redução de dimensionalidade para fugir desse problema faz com que a base perca uma alta porcentagem de variância, sendo esse o culpado dos resultados ruins aplicando o PCA.
+
+Podemos categorizar os resultados dos outros algoritmos em dois grupos:
+
+\begin{itemize}
+\item \emph{SVM e Redes Neurais}: Apresentaram resultados extremamente similares, com o SVM tendo uma minuscula vantagem. Ambos tiveram acurácia de mais de 87\%, indicando-os como uma alternativa viável para a predição do sucesso ou não das campanhas de telemarketing. O valor obtido do MCC, em torno de 0.75, indica uma correlação boa para os modelos treinados.
+
+Vale notar que o balanceamento de dados citado na Seção II foi um fator de extrema importância para a obtenção deste resultado, pois os dados desbalanceados, apesar de fazerem com que os modelos apresentassem níveis de acurácia superiores aos reportados nesta seção, o valor do MCC era bem baixo, pois a maioria das amostras de teste eram classificadas como sendo da classe majoritária. Foi definido que o valor do MCC representa uma métrica mais representativa da qualidade do modelo para o cenário deste trabalho.
+
+ \item \emph{Regressão Logística}: Apresentou, com uma boa vantagem, os melhores resultados em todas as métricas. Além de tudo, foi o método que apresentou execução mais rápida. Com acurácia de 97.5\%, F-medida de 0.976 e 0.952 de MCC, o modelo treinado indica ser, com certeza, o melhor para a previsão, neste cenário, das vendas ou não para os clientes.
+\end{itemize}

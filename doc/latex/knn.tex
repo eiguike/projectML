@@ -1,0 +1,9 @@
+\subsection{K-vizinhos mais próximos}
+ 
+Nos experimentos com o algoritmo k-vizinhos mais próximos, foram identificados problemas de acurácia devido à dimensionalidade dos dados. Devido a isso, o algoritmo apresentou problemas na classificação dos dados de teste, apresentando vários casos onde a distância de diversas amostras ficou idêntica, assim comprometendo o agrupamento dos k-vizinhos. 
+
+O cálculo da distância, inicialmente Euclidiana, foi modificado para \emph{Manhattan} e posteriormente \emph{Minkowski}, entretanto tais mudanças não refletiram numa melhora real na acurácia. Portanto, optou-se por continuar utilizando a distância Euclidiana.
+
+Para tentar contornar os resultados insatisfatórios, foi utilizada a técnica do PCA (Análise das Componentes Principais) para reduzir a dimensionalidade da base, mantendo 95\% de variância dos dados. Verificou-se uma melhora, porém não muito expressiva.
+
+Finalmente, foram realizados testes com $K = 1, 3, 5, 7, 9$, e foi escolhido $K=7$ por apresentar os melhores resultados.

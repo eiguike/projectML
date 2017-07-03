@@ -1,0 +1,60 @@
+ \section{Dados Utilizados}
+	Nesta seção é apresentada a base de dados utilizada neste trabalho, juntamente com o processo de pré-processamento realizado para possibilitar o uso dos algoritmos desejados.
+    
+    A base de dados original foi apresentada por \cite{bank_dataset} e contém dados de uma campanha de marketing de um banco de Portugal com 41.188 amostras com 21 atributos referentes às seguintes categorias:
+\begin{itemize}
+  \item Dados do cliente contatado:
+      \begin{itemize}
+          \item idade, profissão, estado civil, escolaridade, situação de inadimplência de crédito, existência de empréstimos pessoais e relacionados à moradia.
+      \end{itemize}
+  \item Dados do último contato relacionado à campanha: 
+      \begin{itemize} 
+          \item tipo do contato (telefone fixo ou móvel), mês, dia da semana e duração, em minutos. 
+      \end{itemize}
+  \item Dados de contexto social e econômico:
+      \begin{itemize}
+          \item  índice de desemprego (trimestral), índice de preços no consumidor (mensal), índice de confiança do consumidor (mensal), taxa interbancária oferecida em euro (diário) e número de empregados (trimestral).
+      \end{itemize}
+  \item  Outros:
+      \begin{itemize} 
+          \item numero de contatos com o cliente na campanha, número de dias do último contato relacionado a alguma campanha e resultado desta, e número de contatos com o cliente antes da campanha em questão. 
+      \end{itemize}
+     \item  Resultado:
+      \begin{itemize} 
+          \item O sucesso ou não da campanha.
+      \end{itemize}
+\end{itemize} 
+
+
+Após uma análise inicial dos dados, optou-se por remover o atributo relacionado à inadimplência, pois apenas três amostras no conjunto tinham valor positivo, e a maioria das amostras não tinha informação sobre seu valor.
+
+Após essa remoção, a base ainda apresentava o problema de um número considerável de amostras com pelo menos um atributo faltando (aproximadamente 7\% da base), o que prejudicava a aplicação dos algoritmos desejados. Pela disponibilidade de um número satisfatório de amostras, optou-se pela sua remoção, resultando em 38.247 amostras restantes.
+
+O atributo relacionado ao número de dias desde o último contato foi notado como possível problema para os algoritmos, pois, nos dados, a representação de uma situação em que esse contato não existiu foi definida pelos seus criadores com o valor 999. Para os algoritmos, seria uma diferença extrema entre os outros valores, visto que o valor máximo apresentado na base é 33. Para lidar com isso, decidiu-se utilizar o valor 50 nessas situações, mantendo assim uma diferenciação razoável para casos em que esse contato existiu anteriormente e casos nos quais ele não existiu.
+
+Outro problema encontrado foi a presença de atributos nominais, como por exemplo a profissão do cliente, o que complicava a utilização dos dados. Para tratá-lo, duas abordagens distintas foram tomadas:
+
+\begin{itemize}
+\item Para o atributo \emph{escolaridade}, cujos valores nominais representam uma escala bem definida, os valores (\emph{analfabeto, básico (4 anos), básico (6 anos), básico (9 anos), médio, superior, pós-graduação}) foram mapeados numa escala de 0 a 6.
+\item Cada um dos outros atributos nominais, cujo domínio não possibilita a abordagem acima, foi transformado em $n$ atributos binários (sendo $n$ o número de diferentes valores presentes). Por exemplo, o atributo \emph{estado civil}, que apresentava os valores \emph{solteiro, casado} e \emph{divorciado}, foi mapeado em \emph{bool-solteiro, bool-casado} e \emph{bool-divorciado}. Exemplificando, valores de, respectivamente, \emph{0, 1} e \emph{0} nesses atributos são usados para representar o valor \emph{casado} no atributo original. 
+\end{itemize}
+
+Após o procedimento descito acima, totalizou-se 34 atributos na base. Analisando a distribuição de classes no conjunto de dados, restaram 33.988 amostras negativas e 4,258 amostras positivas. Em experimentos iniciais, verificou-se que, apesar de os algoritmos aplicados terem obtido bons níveis de acurácia, essa disparidade entre classes fazia com que a revocação da classe minoritária fosse baixa, ou seja, eles tendiam a classificar novas amostras na classe majoritária. 
+
+Para tratar esse problema, foram realizados testes com diferentes proporções de amostras positivas e negativas (com \emph{undersampling}), avaliando sempre o MCC (\emph{Matthews Correlation Coefficient}). 
+
+\begin{table}[ht]
+	\centering
+  \begin{tabular}{ | c | c | c |}
+    \hline
+     & Amostras positivas & Amostras negativas \\ \hline
+    Antes & 4258 & 33988 \\ \hline
+    Depois & 4258 & 4258 \\
+    \hline
+  \end{tabular}
+  \caption{Distribuição de amostras antes e depois do balanceamento}
+  \label{tab:tabela_amostra}
+\end{table}
+
+Os melhores resultados foram obtidos com o mesmo número de amostras nas duas classes, portanto decidiu-se pela remoção de amostras negativas aleatóriamente para ter uma base perfeitamente balanceada. A Tabela \ref{tab:tabela_amostra} apresenta a distribuição de classes antes e depois do processo de balanceamento.
+   

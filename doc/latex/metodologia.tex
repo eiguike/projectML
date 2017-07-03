@@ -1,0 +1,30 @@
+\section{Metodologia Experimental}
+
+Foram definidos quatro algoritmos a serem utilizados para os experimentos de Aprendizado de Máquina: k-vizinhos mais próximos (\emph{k-NN}) \cite{knn}, regressão logística \cite{logistic}, redes neurais artificiais \cite{neural_networks} e máquina de vetores de suporte (\emph{SVM}) \cite{svm}. As próximas subseções reportam as metodologias experimentais gerais e específicas para cada algoritmo.
+
+\subsection{Implementação}
+Todos os algoritmos foram implementados utilizando \emph{GNU Octave}.
+
+\subsection{Avaliação}
+Para avaliar a capacidade de generalização dos modelos construídos e evitar o super-ajustamento (\emph{overfitting}), foi selecionada a técnica de validação cruzada com $k$ partições, utilizando $k = 5$. 
+
+\subsection{Métricas}
+As seguintes métricas foram escolhidas para avaliar o desempenho dos modelos construídos:
+
+\begin{itemize}
+\item Acurácia - porcentagem de amostras classificadas corretamente
+\item F-Medida - media harmônica entre precisão e revocação
+\item MCC (\emph{Matthews Correlation Coefficient}) - medida de qualidade de classificações binárias
+\end{itemize}
+
+\subsection{Normalização e Redução de Dimensionalidade}
+Uma técnica comumente utilizada para algoritmos de Aprendizado de Máquina é a normalização dos dados, para que o conjunto de valores de cada atributo tenha média 0 e desvio padrão 1, de modo que todos os atributos estejam na mesma escala. 
+
+Outra prática comum é a aplicação do PCA (Análise de Componentes Principais) para reduzir a dimensionalidade dos dados, com diferentes motivações (como por exemplo, a aceleração do treinamento). 
+
+Como os algoritmos a serem implementados tem propriedades bem distintas entre si, a aplicação das técnicas citadas acima foi avaliada separadamente para cada um. Essas avaliações, juntamente com metodologias especificas para cada algoritmo, são apresentadas nas subseções abaixo.
+
+\input{knn.tex}
+\input{logistic_regression.tex}
+\input{ann.tex}
+\input{svm.tex}
